@@ -77,6 +77,7 @@ func main() {
 	http.HandleFunc("/getRaceByYear", corsMiddleware(getRaceByYearHandler))
 	http.HandleFunc("/getSelectedResult", corsMiddleware(getSelectedResultHandler))
 	http.HandleFunc("/getResultByHourseName", corsMiddleware(getResultByHourseNameHandler))
+	http.HandleFunc("/getAllHourseNames", corsMiddleware(getAllHourseNamesHandler))
 
 	log.Println("Server starting on port 8080...")
 	log.Fatal(http.ListenAndServe(":8080", nil))
@@ -216,9 +217,9 @@ func getResultByHourseNameHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	query := "SELECT id, year, month, day, grade, race_name, result, hourse_name, age, jockey_name, race_time FROM t_hourse_race_result WHERE hourse_name = ? ORDER BY year, month, day"
+	query := "SELECT id, year, month, day, grade, race_name, result, hourse_name, age, jockey_name, race_time FROM t_hourse_race_result WHERE hourse_name LIKE ? ORDER BY hourse_name, year, month, day"
 
-	rows, err := db.Query(query, hourseName)
+	rows, err := db.Query(query, "%"+hourseName+"%")
 	if err != nil {
 		respondError(w, "Database query error", http.StatusInternalServerError)
 		log.Println("Query error:", err)
@@ -238,4 +239,31 @@ func getResultByHourseNameHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondJSON(w, results)
+}
+
+// getAllHourseNamesHandler handles /getAllHourseNames
+// Returns all unique horse names sorted alphabetically
+func getAllHourseNamesHandler(w http.ResponseWriter, r *http.Request) {
+	query := "SELECT DISTINCT hourse_name FROM t_hourse_race_result WHERE hourse_name IS NOT NULL ORDER BY hourse_name"
+
+	rows, err := db.Query(query)
+	if err != nil {
+		respondError(w, "Database query error", http.StatusInternalServerError)
+		log.Println("Query error:", err)
+		return
+	}
+	defer rows.Close()
+
+	var names []string
+	for rows.Next() {
+		var name string
+		if err := rows.Scan(&name); err != nil {
+			respondError(w, "Scan error", http.StatusInternalServerError)
+			log.Println("Scan error:", err)
+			return
+		}
+		names = append(names, name)
+	}
+
+	respondJSON(w, names)
 }
