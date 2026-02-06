@@ -183,3 +183,30 @@
   - `getResultByHourseName` ✓
 
 ---
+
+## 9. GitHubリポジトリへのプッシュ
+
+**プロンプト：**
+
+> では、memo.txtに記載してあるgitにプッシュしておいてください
+>
+> 今回のこともprompts.mdに書いておいてくださいね
+
+**対応内容：**
+
+- 現在のディレクトリが親の`MY_STUDY`リポジトリの一部であることを確認
+- `003`ディレクトリで新規に`git init`を実行
+- ブランチを`main`にリネーム
+- リモートを追加：`https://github.com/toyotarou/test_flutter_claude_code_test3.git`
+- 以下のファイルをステージング：
+  - `go_api/.env.example`
+  - `go_api/.gitignore`
+  - `go_api/go.mod`
+  - `go_api/go.sum`
+  - `go_api/main.go`
+  - `go_api/prompts.md`
+  - `memo.txt`
+- `.env`は`.gitignore`により除外されていることを確認
+- コミット＆プッシュ完了
+
+---
