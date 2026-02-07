@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
           error: Color(0xFFE94560),
         ),
       ),
-      home: const HomeScreen(),
+      home: GestureDetector(onTap: () => primaryFocus?.unfocus(), child: const HomeScreen()),
     );
   }
 }
