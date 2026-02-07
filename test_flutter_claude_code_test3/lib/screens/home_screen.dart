@@ -40,7 +40,7 @@ class HomeScreen extends HookConsumerWidget {
             ),
           ),
         ),
-        body: asyncRaces.when(
+        body: SafeArea(child: asyncRaces.when(
           data: (races) => _buildBody(context, races, ref, searchController),
           loading: () => const Center(
             child: Column(
@@ -92,7 +92,7 @@ class HomeScreen extends HookConsumerWidget {
               ],
             ),
           ),
-        ),
+        )),
       ),
     );
   }
