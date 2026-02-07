@@ -637,3 +637,37 @@
 - `hasClients`チェックで安全にスクロールリセット
 
 ---
+
+## 33. flutter runで「No pubspec.yaml file found」エラー
+
+**プロンプト：**
+
+> flutter run したら以下のエラーが出た
+> ```
+> Error 1 retrieving device properties for Pixel 6a:
+> adb: device 'adb-28091JEGR26348-ecLBS1' not found
+>
+> Error: No pubspec.yaml file found.
+> This command should be run from the root of your Flutter project.
+> ```
+> こんなふうに出たとき、どう対応すればいいのでしょうか？
+
+**原因：**
+
+- `flutter run`はFlutterプロジェクトのルート（`pubspec.yaml`がある場所）で実行する必要がある
+- `003`ディレクトリで実行していたため、`pubspec.yaml`が見つからなかった
+- デバイスエラーはPixel 6aのUSB接続が不安定だった可能性
+
+**対応内容：**
+
+- Flutterプロジェクトディレクトリに移動してから実行：
+  ```bash
+  cd test_flutter_claude_code_test3
+  flutter run
+  ```
+- デバイスが認識されない場合はUSBケーブル抜き差し、またはadbサーバー再起動：
+  ```bash
+  adb kill-server && adb start-server
+  ```
+
+---
