@@ -202,6 +202,7 @@ class HomeScreen extends HookConsumerWidget {
         final date = '${race.year}/${race.month}/${race.day}';
         final courseKind = race.courseKind ?? '';
         final courseLength = race.courseLength ?? '';
+        final grade = (race.grade ?? '').toUpperCase();
 
         return GestureDetector(
           onTap: () => _showRaceResultDialog(context, race),
@@ -240,14 +241,51 @@ class HomeScreen extends HookConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          race.raceName ?? '',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          overflow: TextOverflow.ellipsis,
+                        Row(
+                          children: [
+                            if (grade.isNotEmpty)
+                              Container(
+                                margin: const EdgeInsets.only(right: 6),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: switch (grade) {
+                                      'G1' => [const Color(0xFFFFD700), const Color(0xFFFFA000)],
+                                      'G2' => [const Color(0xFFC0C0C0), const Color(0xFF9E9E9E)],
+                                      'G3' => [const Color(0xFFCD7F32), const Color(0xFF8D6E63)],
+                                      _ => [const Color(0xFF455A64), const Color(0xFF37474F)],
+                                    },
+                                  ),
+                                  borderRadius: BorderRadius.circular(4),
+                                  boxShadow: grade == 'G1'
+                                      ? [BoxShadow(color: const Color(0xFFFFD700).withValues(alpha: 0.4), blurRadius: 4)]
+                                      : null,
+                                ),
+                                child: Text(
+                                  grade,
+                                  style: TextStyle(
+                                    color: grade == 'G2' ? Colors.black87 : Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ),
+                            Expanded(
+                              child: Text(
+                                race.raceName ?? '',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 2),
                         Text(
