@@ -3,13 +3,14 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 
+import '../config/api_config.dart';
 import '../models/hourse_race_list.dart';
 // ignore: unused_import
 import '../models/hourse_race_result.dart';
 
 final allRaceProvider = FutureProvider<List<HourseRaceList>>((ref) async {
   final response = await http.get(
-    Uri.parse('http://192.168.0.11:8080/getAllRace'),
+    Uri.parse('$baseUrl/getAllRace'),
   );
 
   if (response.statusCode != 200) {
@@ -35,7 +36,7 @@ class SelectedYearNotifier extends Notifier<String?> {
 
 final allHourseNamesProvider = FutureProvider<List<String>>((ref) async {
   final response = await http.get(
-    Uri.parse('http://192.168.0.11:8080/getAllHourseNames'),
+    Uri.parse('$baseUrl/getAllHourseNames'),
   );
 
   if (response.statusCode != 200) {
@@ -52,7 +53,7 @@ Future<List<HourseRaceResult>> fetchSelectedResult({
   required String day,
   required String raceName,
 }) async {
-  final uri = Uri.parse('http://192.168.0.11:8080/getSelectedResult')
+  final uri = Uri.parse('$baseUrl/getSelectedResult')
       .replace(queryParameters: {
     'year': year,
     'month': month,
@@ -75,7 +76,7 @@ Future<List<HourseRaceResult>> fetchSelectedResult({
 Future<List<HourseRaceResult>> fetchResultByHourseName({
   required String hourseName,
 }) async {
-  final uri = Uri.parse('http://192.168.0.11:8080/getResultByHourseName')
+  final uri = Uri.parse('$baseUrl/getResultByHourseName')
       .replace(queryParameters: {'hourse_name': hourseName});
 
   final response = await http.get(uri);

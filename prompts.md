@@ -477,3 +477,23 @@
 - ダイアログ内はListViewでスクロール可能（出場回数が多くても対応）
 
 ---
+
+## 24. ベースURL変数化＆ファイル分割リファクタリング
+
+**プロンプト：**
+
+> リファクタリング計画: ベースURL変数化 + ファイル分割
+> home_screen.dart (1007行) に全てのWidgetクラスが集中しており、APIのベースURL `http://192.168.0.11:8080` が race_provider.dart に4箇所ハードコードされている。サーバー変更時に一括変更できるよう変数化し、ファイルを適切に分割する。
+
+**対応内容：**
+
+- `lib/config/api_config.dart` を新規作成（`baseUrl`定数を定義）
+- `lib/providers/race_provider.dart` のハードコードURL4箇所を`baseUrl`に置換
+- `lib/widgets/search_bar_widget.dart` を新規作成（`SearchBarWidget`として公開）
+- `lib/widgets/race_result_dialog.dart` を新規作成（`RaceResultDialog`として公開）
+- `lib/widgets/horse_search_result_dialog.dart` を新規作成（`HorseSearchResultDialog`として公開）
+- `lib/widgets/result_chart_painter.dart` を新規作成（`ResultChartPainter`として公開）
+- `lib/screens/home_screen.dart` をスリム化（1007行→313行、HomeScreen本体のみ）
+- `flutter analyze` でエラーなしを確認
+
+---
