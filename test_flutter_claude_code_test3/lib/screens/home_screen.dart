@@ -14,6 +14,7 @@ class HomeScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final searchController = useTextEditingController();
+    final scrollController = useScrollController();
     final asyncRaces = ref.watch(allRaceProvider);
 
     return GestureDetector(
@@ -41,7 +42,7 @@ class HomeScreen extends HookConsumerWidget {
           ),
         ),
         body: SafeArea(child: asyncRaces.when(
-          data: (races) => _buildBody(context, races, ref, searchController),
+          data: (races) => _buildBody(context, races, ref, searchController, scrollController),
           loading: () => const Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -98,7 +99,7 @@ class HomeScreen extends HookConsumerWidget {
   }
 
   Widget _buildBody(BuildContext context, List<HourseRaceList> races,
-      WidgetRef ref, TextEditingController searchController) {
+      WidgetRef ref, TextEditingController searchController, ScrollController scrollController) {
     final selectedYear = ref.watch(selectedYearProvider);
     final hourseNames = ref.watch(allHourseNamesProvider).value ?? [];
 
@@ -123,8 +124,8 @@ class HomeScreen extends HookConsumerWidget {
           hourseNames: hourseNames,
           onSearch: () => _onSearch(context, searchController),
         ),
-        _buildYearSelector(years, selectedYear, ref),
-        Expanded(child: _buildRaceList(context, filteredRaces)),
+        _buildYearSelector(years, selectedYear, ref, scrollController),
+        Expanded(child: _buildRaceList(context, filteredRaces, scrollController)),
       ],
     );
   }
@@ -145,7 +146,7 @@ class HomeScreen extends HookConsumerWidget {
   }
 
   Widget _buildYearSelector(
-      List<String> years, String? selectedYear, WidgetRef ref) {
+      List<String> years, String? selectedYear, WidgetRef ref, ScrollController scrollController) {
     return Container(
       height: 60,
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -168,6 +169,9 @@ class HomeScreen extends HookConsumerWidget {
               ref
                   .read(selectedYearProvider.notifier)
                   .select(isSelected ? null : year);
+              if (scrollController.hasClients) {
+                scrollController.jumpTo(0);
+              }
             },
             child: CircleAvatar(
               radius: 22,
@@ -189,8 +193,9 @@ class HomeScreen extends HookConsumerWidget {
     );
   }
 
-  Widget _buildRaceList(BuildContext context, List<HourseRaceList> races) {
+  Widget _buildRaceList(BuildContext context, List<HourseRaceList> races, ScrollController scrollController) {
     return ListView.separated(
+      controller: scrollController,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       itemCount: races.length,
       separatorBuilder: (_, __) => const Divider(
