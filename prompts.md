@@ -554,3 +554,21 @@
 - 入力文字で始まる馬名のみが候補に表示されるように
 
 ---
+
+## 28. アプリ名を「flutter_hourse_race_result」に変更
+
+**プロンプト：**
+
+> 今、apkをビルドすると「test_flutter_claude_code_test3」みたいに
+> ディレクトリの名前になっちゃうんだ
+>
+> これを「flutter_hourse_race_result」に直して欲しい
+> あとからアプリ名を変えることってできますか？
+
+**対応内容：**
+
+- Android: `AndroidManifest.xml` の `android:label` を変更
+- iOS: `Info.plist` の `CFBundleDisplayName` と `CFBundleName` を変更
+- 上記3箇所を `flutter_hourse_race_result` に統一
+
+---
