@@ -28,7 +28,7 @@ class SearchBarWidgetState extends State<SearchBarWidget> {
       return;
     }
     final filtered = widget.hourseNames
-        .where((name) => name.contains(katakana))
+        .where((name) => name.startsWith(katakana))
         .take(20)
         .toList();
     setState(() => _suggestions = filtered);
