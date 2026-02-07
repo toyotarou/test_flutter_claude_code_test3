@@ -572,3 +572,18 @@
 - 上記3箇所を `flutter_hourse_race_result` に統一
 
 ---
+
+## 29. 画面を縦向き固定にする
+
+**プロンプト：**
+
+> 今、実機を横にすると画面が横になっちゃうんだ
+> これを縦固定にして欲しいな
+
+**対応内容：**
+
+- `lib/main.dart` の `main()` に `SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])` を追加
+- `WidgetsFlutterBinding.ensureInitialized()` を追加（SystemChrome使用前に必要）
+- 端末を横にしても画面が回転しなくなる
+
+---
