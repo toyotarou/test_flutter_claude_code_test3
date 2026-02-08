@@ -671,3 +671,30 @@
   ```
 
 ---
+
+## 34. @riverpod アノテーション化 + stateの切り離し
+
+**プロンプト：**
+
+> classの上に
+> @riverpod
+> がある書き方の方が馴染みがあるので、この書き方にしてほしいのですが、今の書き方の方がいい、とかありましたら教えてください。
+> たぶん、stateの切り離しも必要かな？
+
+**対応内容：**
+
+- Flutter SDKを3.32.1（Dart 3.8.1）→ 3.38.9（Dart 3.10.8）にアップグレード
+- `riverpod_annotation`、`riverpod_generator` パッケージを追加
+- `pubspec.yaml` の SDK制約を `^3.10.0` に更新
+- `lib/providers/race_provider.dart` を `@riverpod` アノテーション方式に全面書き換え：
+  - `FutureProvider` → `@riverpod` 関数（`allRace`, `allHourseNames`）
+  - `NotifierProvider` + `Notifier` → `@riverpod` クラス（`SelectedYear extends _$SelectedYear`）
+  - 素のFuture関数 `fetchSelectedResult` → `@riverpod` family provider（`selectedResultProvider`）
+  - 素のFuture関数 `fetchResultByHourseName` → `@riverpod` family provider（`resultByHourseNameProvider`）
+- ダイアログWidgetのstate切り離し：
+  - `RaceResultDialog`: `StatefulWidget` + `FutureBuilder` → `ConsumerWidget` + `ref.watch(selectedResultProvider(...))`
+  - `HorseSearchResultDialog`: `StatefulWidget` + `FutureBuilder` → `ConsumerWidget` + `ref.watch(resultByHourseNameProvider(...))`
+- `build_runner` でコード生成（`race_provider.g.dart`）
+- `flutter analyze` でエラーなし確認
+
+---

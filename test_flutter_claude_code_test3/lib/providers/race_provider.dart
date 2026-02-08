@@ -1,14 +1,16 @@
 import 'dart:convert';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../config/api_config.dart';
 import '../models/hourse_race_list.dart';
-// ignore: unused_import
 import '../models/hourse_race_result.dart';
 
-final allRaceProvider = FutureProvider<List<HourseRaceList>>((ref) async {
+part 'race_provider.g.dart';
+
+@riverpod
+Future<List<HourseRaceList>> allRace(Ref ref) async {
   final response = await http.get(
     Uri.parse('$baseUrl/getAllRace'),
   );
@@ -19,13 +21,10 @@ final allRaceProvider = FutureProvider<List<HourseRaceList>>((ref) async {
 
   final List<dynamic> jsonList = json.decode(response.body);
   return jsonList.map((json) => HourseRaceList.fromJson(json)).toList();
-});
+}
 
-final selectedYearProvider =
-    NotifierProvider<SelectedYearNotifier, String?>(
-        SelectedYearNotifier.new);
-
-class SelectedYearNotifier extends Notifier<String?> {
+@riverpod
+class SelectedYear extends _$SelectedYear {
   @override
   String? build() => null;
 
@@ -34,7 +33,8 @@ class SelectedYearNotifier extends Notifier<String?> {
   }
 }
 
-final allHourseNamesProvider = FutureProvider<List<String>>((ref) async {
+@riverpod
+Future<List<String>> allHourseNames(Ref ref) async {
   final response = await http.get(
     Uri.parse('$baseUrl/getAllHourseNames'),
   );
@@ -45,9 +45,11 @@ final allHourseNamesProvider = FutureProvider<List<String>>((ref) async {
 
   final List<dynamic> jsonList = json.decode(response.body);
   return jsonList.cast<String>();
-});
+}
 
-Future<List<HourseRaceResult>> fetchSelectedResult({
+@riverpod
+Future<List<HourseRaceResult>> selectedResult(
+  Ref ref, {
   required String year,
   required String month,
   required String day,
@@ -73,7 +75,9 @@ Future<List<HourseRaceResult>> fetchSelectedResult({
   return jsonList.map((json) => HourseRaceResult.fromJson(json)).toList();
 }
 
-Future<List<HourseRaceResult>> fetchResultByHourseName({
+@riverpod
+Future<List<HourseRaceResult>> resultByHourseName(
+  Ref ref, {
   required String hourseName,
 }) async {
   final uri = Uri.parse('$baseUrl/getResultByHourseName')
