@@ -846,3 +846,21 @@
 - 付録: 用語集、ドキュメント体系図
 
 ---
+
+## 44. あいうえおリストのアクティブ馬に着順CircleAvatar表示
+
+**プロンプト：**
+
+あいうえおリストの、「去年、今年に出走している馬（白文字）」をcolumnに変えて、名前の下に、着順を表示してもらえますか。CircleAvatarの中に数字みたいな。小さくていいです。中には21走みたいな馬もいますので、横向きのスクロールが必要です。
+
+**対応内容：**
+
+- `horse_name_list_dialog.dart` を修正
+- アクティブ馬（去年・今年出走）の表示をRowからColumnに変更
+- 馬名の下に `resultByHourseNameProvider` で取得した着順をCircleAvatarで表示
+- CircleAvatar: radius 10, fontSize 9（1着=金, 2着=銀, 3着=銅, その他=グレー）
+- 横スクロール対応（`ListView.separated` + `scrollDirection: Axis.horizontal`）
+- `_ActiveHorseItem` ConsumerWidget を新規作成（個別にレース結果を取得）
+- 非アクティブ馬は従来通りの表示（白38%テキスト）
+
+---

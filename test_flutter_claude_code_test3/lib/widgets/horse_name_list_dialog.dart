@@ -118,11 +118,11 @@ class HorseNameListDialog extends ConsumerWidget {
         ),
         ...items.map((stats) {
           final active = _isActive(stats);
+          if (active) {
+            return _ActiveHorseItem(stats: stats);
+          }
           return InkWell(
             onTap: () {
-              // Navigator.of(context).pop();
-              //
-
               showDialog(
                 context: context,
                 builder: (context) => HorseSearchResultDialog(hourseName: stats.hourseName),
@@ -135,12 +135,12 @@ class HorseNameListDialog extends ConsumerWidget {
                   Expanded(
                     child: Text(
                       stats.hourseName,
-                      style: TextStyle(color: active ? Colors.white : Colors.white38, fontSize: 14),
+                      style: const TextStyle(color: Colors.white38, fontSize: 14),
                     ),
                   ),
                   Text(
                     '${stats.raceCount}走',
-                    style: TextStyle(color: active ? Colors.white70 : Colors.white24, fontSize: 12),
+                    style: const TextStyle(color: Colors.white24, fontSize: 12),
                   ),
                 ],
               ),
@@ -149,5 +149,93 @@ class HorseNameListDialog extends ConsumerWidget {
         }),
       ],
     );
+  }
+}
+
+class _ActiveHorseItem extends ConsumerWidget {
+  final HourseNameStats stats;
+  const _ActiveHorseItem({required this.stats});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asyncResults = ref.watch(
+      resultByHourseNameProvider(hourseName: stats.hourseName),
+    );
+
+    return InkWell(
+      onTap: () => showDialog(
+        context: context,
+        builder: (context) => HorseSearchResultDialog(hourseName: stats.hourseName),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    stats.hourseName,
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                  ),
+                ),
+                Text(
+                  '${stats.raceCount}走',
+                  style: const TextStyle(color: Colors.white70, fontSize: 12),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            asyncResults.when(
+              loading: () => const SizedBox(height: 22),
+              error: (_, __) => const SizedBox.shrink(),
+              data: (results) {
+                final filtered = results
+                    .where((r) => r.hourseName == stats.hourseName)
+                    .toList();
+                if (filtered.isEmpty) return const SizedBox.shrink();
+                return SizedBox(
+                  height: 22,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: filtered.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 3),
+                    itemBuilder: (context, index) {
+                      final pos = filtered[index].result ?? 0;
+                      return CircleAvatar(
+                        radius: 10,
+                        backgroundColor: _posColor(pos),
+                        child: Text(
+                          '$pos',
+                          style: const TextStyle(
+                            fontSize: 9,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Color _posColor(int pos) {
+    switch (pos) {
+      case 1:
+        return const Color(0xFFFFD700); // Gold
+      case 2:
+        return const Color(0xFFC0C0C0); // Silver
+      case 3:
+        return const Color(0xFFCD7F32); // Bronze
+      default:
+        return const Color(0xFF555555);
+    }
   }
 }
