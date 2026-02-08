@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 
+import '../models/hourse_name_stats.dart';
 import '../providers/race_provider.dart';
 
 class SearchBarWidget extends StatefulWidget {
   const SearchBarWidget({
     super.key,
     required this.searchController,
-    required this.hourseNames,
+    required this.hourseNameStats,
     required this.onSearch,
     required this.onListTap,
   });
 
   final TextEditingController searchController;
-  final List<String> hourseNames;
+  final List<HourseNameStats> hourseNameStats;
   final VoidCallback onSearch;
   final VoidCallback onListTap;
 
@@ -21,7 +22,14 @@ class SearchBarWidget extends StatefulWidget {
 }
 
 class SearchBarWidgetState extends State<SearchBarWidget> {
-  List<String> _suggestions = [];
+  List<HourseNameStats> _suggestions = [];
+
+  bool _isActive(HourseNameStats stats) {
+    final now = DateTime.now();
+    final currentYear = now.year;
+    final lastYear = int.tryParse(stats.lastYear) ?? 0;
+    return lastYear >= currentYear - 1;
+  }
 
   void _onTextChanged(String value) {
     final katakana = toKatakana(value.trim());
@@ -29,8 +37,8 @@ class SearchBarWidgetState extends State<SearchBarWidget> {
       setState(() => _suggestions = []);
       return;
     }
-    final filtered = widget.hourseNames
-        .where((name) => name.startsWith(katakana))
+    final filtered = widget.hourseNameStats
+        .where((stats) => stats.hourseName.startsWith(katakana))
         .toList();
     setState(() => _suggestions = filtered);
   }
@@ -141,16 +149,32 @@ class SearchBarWidgetState extends State<SearchBarWidget> {
                 shrinkWrap: true,
                 itemCount: _suggestions.length,
                 itemBuilder: (context, index) {
-                  final name = _suggestions[index];
+                  final stats = _suggestions[index];
+                  final active = _isActive(stats);
                   return InkWell(
-                    onTap: () => _selectSuggestion(name),
+                    onTap: () => _selectSuggestion(stats.hourseName),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 10),
-                      child: Text(
-                        name,
-                        style: const TextStyle(
-                            color: Colors.white, fontSize: 14),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              stats.hourseName,
+                              style: TextStyle(
+                                color: active ? Colors.white : Colors.white38,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            '${stats.raceCount}走',
+                            style: TextStyle(
+                              color: active ? Colors.white70 : Colors.white24,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   );

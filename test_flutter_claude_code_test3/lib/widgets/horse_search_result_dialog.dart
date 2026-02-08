@@ -94,6 +94,7 @@ class HorseSearchResultDialog extends ConsumerWidget {
         ...results.map((r) {
           final date = '${r.year}/${r.month}/${r.day}';
           final place = r.result ?? 0;
+          final grade = (r.grade ?? '').toUpperCase();
 
           Color placeColor;
           if (place == 1) {
@@ -107,8 +108,9 @@ class HorseSearchResultDialog extends ConsumerWidget {
           }
 
           return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
+            padding: const EdgeInsets.symmetric(vertical: 5),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(
                   width: 28,
@@ -122,28 +124,59 @@ class HorseSearchResultDialog extends ConsumerWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
-                SizedBox(
-                  width: 80,
-                  child: Text(
-                    date,
-                    style: const TextStyle(
-                      color: Color(0xFF53C0F0),
-                      fontSize: 12,
-                      fontFeatures: [FontFeature.tabularFigures()],
+                const SizedBox(width: 6),
+                if (grade.isNotEmpty)
+                  Container(
+                    width: 28,
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: switch (grade) {
+                          'G1' => [const Color(0xFFFFD700), const Color(0xFFFFA000)],
+                          'G2' => [const Color(0xFFC0C0C0), const Color(0xFF9E9E9E)],
+                          'G3' => [const Color(0xFFCD7F32), const Color(0xFF8D6E63)],
+                          _ => [const Color(0xFF455A64), const Color(0xFF37474F)],
+                        },
+                      ),
+                      borderRadius: BorderRadius.circular(4),
+                      boxShadow: grade == 'G1'
+                          ? [BoxShadow(color: const Color(0xFFFFD700).withValues(alpha: 0.4), blurRadius: 4)]
+                          : null,
+                    ),
+                    child: Text(
+                      grade,
+                      style: TextStyle(
+                        color: grade == 'G2' ? Colors.black87 : Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.5,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 4),
+                SizedBox(width: grade.isNotEmpty ? 6 : 0),
                 Expanded(
-                  child: Text(
-                    r.raceName ?? '',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    overflow: TextOverflow.ellipsis,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        date,
+                        style: const TextStyle(
+                          color: Color(0xFF53C0F0),
+                          fontSize: 11,
+                          fontFeatures: [FontFeature.tabularFigures()],
+                        ),
+                      ),
+                      const SizedBox(height: 1),
+                      Text(
+                        r.raceName ?? '',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(width: 4),
@@ -176,7 +209,7 @@ class HorseSearchResultDialog extends ConsumerWidget {
     return Container(
       height: 340,
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.fromLTRB(28, 12, 12, 24),
+      padding: const EdgeInsets.fromLTRB(28, 12, 12, 40),
       decoration: BoxDecoration(
         color: const Color(0xFF0F0F1A),
         borderRadius: BorderRadius.circular(8),
@@ -186,7 +219,7 @@ class HorseSearchResultDialog extends ConsumerWidget {
         painter: ResultChartPainter(
           data: data,
           maxVal: maxVal,
-          dates: results.map((r) => '${r.month}/${r.day}').toList(),
+          dates: results.map((r) => '${r.year}\n${r.month}-${r.day}').toList(),
         ),
       ),
     );

@@ -102,7 +102,7 @@ class HomeScreen extends HookConsumerWidget {
   Widget _buildBody(BuildContext context, List<HourseRaceList> races,
       WidgetRef ref, TextEditingController searchController, ScrollController scrollController) {
     final selectedYear = ref.watch(selectedYearProvider);
-    final hourseNames = ref.watch(allHourseNamesProvider).value ?? [];
+    final hourseNameStats = ref.watch(allHourseNamesWithStatsProvider).value ?? [];
 
     final years = races.map((r) => r.year).whereType<String>().toSet().toList()
       ..sort();
@@ -122,7 +122,7 @@ class HomeScreen extends HookConsumerWidget {
       children: [
         SearchBarWidget(
           searchController: searchController,
-          hourseNames: hourseNames,
+          hourseNameStats: hourseNameStats,
           onSearch: () => _onSearch(context, searchController),
           onListTap: () => _showHorseNameListDialog(context),
         ),

@@ -68,7 +68,7 @@ class ResultChartPainter extends CustomPainter {
 
     // ドット＋下部日付ラベル
     final showDateInterval =
-        data.length <= 6 ? 1 : (data.length / 4).ceil();
+        data.length <= 10 ? 1 : (data.length / 8).ceil();
 
     for (var i = 0; i < data.length; i++) {
       final x = xFor(i);
@@ -100,18 +100,20 @@ class ResultChartPainter extends CustomPainter {
           ..strokeWidth = 1,
       );
 
-      // 日付ラベル
+      // 日付ラベル（2行: 年 + 月-日）
       if (i % showDateInterval == 0 || i == data.length - 1) {
+        final dateStr = i < dates.length ? dates[i] : '';
         final dateTp = TextPainter(
           text: TextSpan(
-            text: i < dates.length ? dates[i] : '',
-            style: const TextStyle(color: Color(0x61FFFFFF), fontSize: 9),
+            text: dateStr,
+            style: const TextStyle(color: Color(0x61FFFFFF), fontSize: 9, height: 1.3),
           ),
+          textAlign: TextAlign.center,
           textDirection: TextDirection.ltr,
         )..layout();
         dateTp.paint(
           canvas,
-          Offset(x - dateTp.width / 2, chartBottom + 6),
+          Offset(x - dateTp.width / 2, chartBottom + 4),
         );
       }
     }
