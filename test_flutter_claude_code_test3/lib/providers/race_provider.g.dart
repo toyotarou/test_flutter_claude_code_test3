@@ -315,3 +315,45 @@ final class ResultByHourseNameFamily extends $Family
   @override
   String toString() => r'resultByHourseNameProvider';
 }
+
+@ProviderFor(allHourseNamesWithStats)
+final allHourseNamesWithStatsProvider = AllHourseNamesWithStatsProvider._();
+
+final class AllHourseNamesWithStatsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<HourseNameStats>>,
+          List<HourseNameStats>,
+          FutureOr<List<HourseNameStats>>
+        >
+    with
+        $FutureModifier<List<HourseNameStats>>,
+        $FutureProvider<List<HourseNameStats>> {
+  AllHourseNamesWithStatsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'allHourseNamesWithStatsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$allHourseNamesWithStatsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<HourseNameStats>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<HourseNameStats>> create(Ref ref) {
+    return allHourseNamesWithStats(ref);
+  }
+}
+
+String _$allHourseNamesWithStatsHash() =>
+    r'f03537325e025e8c123148309242a51e8214018d';

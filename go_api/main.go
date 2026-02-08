@@ -30,6 +30,13 @@ type HourseRaceList struct {
 	Finish       *int    `json:"finish"`
 }
 
+// HourseNameStats represents horse name with stats
+type HourseNameStats struct {
+	HourseName string `json:"hourse_name"`
+	RaceCount  int    `json:"race_count"`
+	LastYear   string `json:"last_year"`
+}
+
 // HourseRaceResult represents t_hourse_race_result table
 type HourseRaceResult struct {
 	ID         int     `json:"id"`
@@ -78,6 +85,7 @@ func main() {
 	http.HandleFunc("/getSelectedResult", corsMiddleware(getSelectedResultHandler))
 	http.HandleFunc("/getResultByHourseName", corsMiddleware(getResultByHourseNameHandler))
 	http.HandleFunc("/getAllHourseNames", corsMiddleware(getAllHourseNamesHandler))
+	http.HandleFunc("/getAllHourseNamesWithStats", corsMiddleware(getAllHourseNamesWithStatsHandler))
 
 	log.Println("Server starting on port 8080...")
 	log.Fatal(http.ListenAndServe(":8080", nil))
@@ -266,4 +274,31 @@ func getAllHourseNamesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondJSON(w, names)
+}
+
+// getAllHourseNamesWithStatsHandler handles /getAllHourseNamesWithStats
+// Returns all horse names with race count and last year of participation
+func getAllHourseNamesWithStatsHandler(w http.ResponseWriter, r *http.Request) {
+	query := "SELECT hourse_name, COUNT(*) as race_count, MAX(year) as last_year FROM t_hourse_race_result WHERE hourse_name IS NOT NULL GROUP BY hourse_name ORDER BY hourse_name"
+
+	rows, err := db.Query(query)
+	if err != nil {
+		respondError(w, "Database query error", http.StatusInternalServerError)
+		log.Println("Query error:", err)
+		return
+	}
+	defer rows.Close()
+
+	var stats []HourseNameStats
+	for rows.Next() {
+		var s HourseNameStats
+		if err := rows.Scan(&s.HourseName, &s.RaceCount, &s.LastYear); err != nil {
+			respondError(w, "Scan error", http.StatusInternalServerError)
+			log.Println("Scan error:", err)
+			return
+		}
+		stats = append(stats, s)
+	}
+
+	respondJSON(w, stats)
 }

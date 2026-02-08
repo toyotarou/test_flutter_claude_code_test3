@@ -8,11 +8,13 @@ class SearchBarWidget extends StatefulWidget {
     required this.searchController,
     required this.hourseNames,
     required this.onSearch,
+    required this.onListTap,
   });
 
   final TextEditingController searchController;
   final List<String> hourseNames;
   final VoidCallback onSearch;
+  final VoidCallback onListTap;
 
   @override
   State<SearchBarWidget> createState() => SearchBarWidgetState();
@@ -29,7 +31,6 @@ class SearchBarWidgetState extends State<SearchBarWidget> {
     }
     final filtered = widget.hourseNames
         .where((name) => name.startsWith(katakana))
-        .take(20)
         .toList();
     setState(() => _suggestions = filtered);
   }
@@ -37,6 +38,7 @@ class SearchBarWidgetState extends State<SearchBarWidget> {
   void _selectSuggestion(String name) {
     widget.searchController.text = name;
     setState(() => _suggestions = []);
+    widget.onSearch();
   }
 
   @override
@@ -105,6 +107,23 @@ class SearchBarWidgetState extends State<SearchBarWidget> {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                   ),
                   child: const Icon(Icons.search, size: 22),
+                ),
+              ),
+              const SizedBox(width: 6),
+              SizedBox(
+                height: 44,
+                child: ElevatedButton(
+                  onPressed: widget.onListTap,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF0F3460),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    minimumSize: const Size(44, 44),
+                  ),
+                  child: const Icon(Icons.list, size: 22),
                 ),
               ),
             ],

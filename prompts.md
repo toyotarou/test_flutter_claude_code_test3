@@ -698,3 +698,50 @@
 - `flutter analyze` でエラーなし確認
 
 ---
+
+## 35. 検索ヒント選択時に自動で検索ダイアログを表示
+
+**プロンプト：**
+
+> 検索ヒントのリストから選んだ場合は
+> 検索ボタンを押さなくても、検索結果のダイアログが表示されるようにしてください。
+
+**対応内容：**
+
+- `lib/widgets/search_bar_widget.dart` の `_selectSuggestion` メソッドで、候補選択後に `widget.onSearch()` を呼び出すよう追加
+- サジェストをタップするだけで検索結果ダイアログが自動表示されるように
+
+---
+
+## 36. 検索ヒントの表示件数制限を撤廃
+
+**プロンプト：**
+
+> 検索ヒントですが、表示件数を絞っていますか？
+> ｢あ｣から始まる馬が少ない気がします。
+> limitいらないです。
+
+**対応内容：**
+
+- `lib/widgets/search_bar_widget.dart` の `.take(20)` を削除
+- 前方一致する全ての馬名が候補として表示されるように
+
+---
+
+## 37. 馬名あいうえおリストボタン追加
+
+**プロンプト：**
+
+> 検索ボタンの右にリストボタンを追加し、タップすると全馬名を「あいうえお順」でグループ化したダイアログを表示する。各馬名に出走回数を表示し、タップで検索結果ダイアログを開く。去年・今年に出走のない馬はグレー表示。
+
+**対応内容：**
+
+- Go API: `/getAllHourseNamesWithStats` エンドポイント追加（馬名・出走回数・最終出走年を返す）
+- Flutter: `HourseNameStats` freezedモデル新規作成
+- Flutter: `allHourseNamesWithStats` @riverpod provider追加
+- Flutter: `HorseNameListDialog` ウィジェット新規作成（あいうえお行グループ化、出走回数表示、非アクティブ馬グレー表示）
+- Flutter: `SearchBarWidget` に `onListTap` コールバック＆リストアイコンボタン追加
+- Flutter: `HomeScreen` にダイアログ表示処理を接続
+- `build_runner` でコード生成、`flutter analyze` エラーなし確認
+
+---

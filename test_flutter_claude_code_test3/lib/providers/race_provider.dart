@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../config/api_config.dart';
+import '../models/hourse_name_stats.dart';
 import '../models/hourse_race_list.dart';
 import '../models/hourse_race_result.dart';
 
@@ -93,6 +94,20 @@ Future<List<HourseRaceResult>> resultByHourseName(
   if (decoded == null) return [];
   final List<dynamic> jsonList = decoded;
   return jsonList.map((json) => HourseRaceResult.fromJson(json)).toList();
+}
+
+@riverpod
+Future<List<HourseNameStats>> allHourseNamesWithStats(Ref ref) async {
+  final response = await http.get(
+    Uri.parse('$baseUrl/getAllHourseNamesWithStats'),
+  );
+
+  if (response.statusCode != 200) {
+    throw Exception('Failed to load horse name stats: ${response.statusCode}');
+  }
+
+  final List<dynamic> jsonList = json.decode(response.body);
+  return jsonList.map((json) => HourseNameStats.fromJson(json)).toList();
 }
 
 String toKatakana(String input) {

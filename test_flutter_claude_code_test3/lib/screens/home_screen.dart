@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../models/hourse_race_list.dart';
 import '../providers/race_provider.dart';
+import '../widgets/horse_name_list_dialog.dart';
 import '../widgets/horse_search_result_dialog.dart';
 import '../widgets/race_result_dialog.dart';
 import '../widgets/search_bar_widget.dart';
@@ -123,6 +124,7 @@ class HomeScreen extends HookConsumerWidget {
           searchController: searchController,
           hourseNames: hourseNames,
           onSearch: () => _onSearch(context, searchController),
+          onListTap: () => _showHorseNameListDialog(context),
         ),
         _buildYearSelector(years, selectedYear, ref, scrollController),
         Expanded(child: _buildRaceList(context, filteredRaces, scrollController)),
@@ -344,6 +346,13 @@ class HomeScreen extends HookConsumerWidget {
           ),
         );
       },
+    );
+  }
+
+  void _showHorseNameListDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => const HorseNameListDialog(),
     );
   }
 
