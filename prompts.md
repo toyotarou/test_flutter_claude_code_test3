@@ -979,7 +979,50 @@
 **対応内容：**
 
 - 原因: `ListView.builder` の遅延描画により、画面外グループの `GlobalKey.currentContext` が `null` で `Scrollable.ensureVisible` が動作しなかった
-- `_buildGroupedList` の `ListView.builder` を `ListView(children: [...])` に変更し、全グループを即座に構築するよう修正
+- `_buildGroupedList` を `SingleChildScrollView` + `Column` に変更し、全グループを即座に構築するよう修正
 - これにより `GlobalKey` が常に有効になり、タップでスクロールが正常に動作するようになった
+
+---
+
+## 53. 馬名一覧ダイアログの表示高速化＋リストのガタつき修正
+
+**プロンプト：**
+
+> ダイアログが開くのが遅くなった。ホーム画面が開いた時にデータを事前準備したい。リストが勝手に動いている気がするので修正してほしい。
+
+**対応内容：**
+
+- `home_screen.dart` で `allHourseNamesWithStatsProvider` を事前にwatchし、ホーム画面表示時にバックグラウンドでデータ取得開始
+- `_ActiveHorseItem` の2つの `asyncResults.when` を1つに統合し、`SizedBox(height: 44)` で固定高に変更
+- データロード時にアイテムの高さが変わらなくなり、リストのガタつきが解消
+
+---
+
+## 54. アクティブ馬の結果データを事前取得して一覧表示を高速化
+
+**プロンプト：**
+
+> 横向きの順位リストが表示されなくなった。ホーム画面が開いた段階でFutureProviderで準備するのはどうですか？
+
+**対応内容：**
+
+- `race_provider.dart` に `activeHorseResultsProvider` を追加（アクティブ馬の結果を一括取得し `Map<馬名, List<結果>>` で返す）
+- `home_screen.dart` で `activeHorseResultsProvider` を事前にwatch（ホーム画面表示時にバックグラウンドで全アクティブ馬の結果を取得）
+- `_ActiveHorseItem` を個別API呼び（`resultByHourseNameProvider`）から事前取得済みMapの参照に変更
+- 個別の非同期処理がなくなり、リストのガタつきと表示遅延が解消
+
+---
+
+## 55. リストボタン押下時にデータ未準備ならSnackBar表示
+
+**プロンプト：**
+
+> ダイアログが開いても横向きの順位リストが表示されない。データ準備が完了していない場合は「表示用データの準備が完了していません」というバルーンを表示したい。
+
+**対応内容：**
+
+- `_showHorseNameListDialog` に `ref` を渡し、`activeHorseResultsProvider` の状態を `hasValue` でチェック
+- データ未準備なら SnackBar で「表示用データの準備が完了していません」を表示し、ダイアログは開かない
+- データ準備完了後は通常通りダイアログを開く
 
 ---

@@ -111,6 +111,40 @@ Future<List<HourseNameStats>> allHourseNamesWithStats(Ref ref) async {
 }
 
 @riverpod
+Future<Map<String, List<HourseRaceResult>>> activeHorseResults(Ref ref) async {
+  final statsList = await ref.watch(allHourseNamesWithStatsProvider.future);
+  final now = DateTime.now();
+  final currentYear = now.year;
+
+  final activeNames = statsList
+      .where((s) {
+        final lastYear = int.tryParse(s.lastYear) ?? 0;
+        return lastYear >= currentYear - 1;
+      })
+      .map((s) => s.hourseName)
+      .toList();
+
+  final map = <String, List<HourseRaceResult>>{};
+
+  await Future.wait(activeNames.map((name) async {
+    final uri = Uri.parse('$baseUrl/getResultByHourseName')
+        .replace(queryParameters: {'hourse_name': name});
+    final response = await http.get(uri);
+    if (response.statusCode == 200) {
+      final decoded = json.decode(response.body);
+      if (decoded != null) {
+        final List<dynamic> jsonList = decoded;
+        map[name] = jsonList
+            .map((j) => HourseRaceResult.fromJson(j as Map<String, dynamic>))
+            .toList();
+      }
+    }
+  }));
+
+  return map;
+}
+
+@riverpod
 Future<Map<String, HourseRaceList>> raceMap(Ref ref) async {
   final races = await ref.watch(allRaceProvider.future);
   final map = <String, HourseRaceList>{};

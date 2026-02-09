@@ -17,6 +17,7 @@ class HomeScreen extends HookConsumerWidget {
     final searchController = useTextEditingController();
     final scrollController = useScrollController();
     final asyncRaces = ref.watch(allRaceProvider);
+    ref.watch(activeHorseResultsProvider);
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
@@ -124,7 +125,7 @@ class HomeScreen extends HookConsumerWidget {
           searchController: searchController,
           hourseNameStats: hourseNameStats,
           onSearch: () => _onSearch(context, searchController),
-          onListTap: () => _showHorseNameListDialog(context),
+          onListTap: () => _showHorseNameListDialog(context, ref),
         ),
         _buildYearSelector(years, selectedYear, ref, scrollController),
         Expanded(child: _buildRaceList(context, filteredRaces, scrollController)),
@@ -349,7 +350,17 @@ class HomeScreen extends HookConsumerWidget {
     );
   }
 
-  void _showHorseNameListDialog(BuildContext context) {
+  void _showHorseNameListDialog(BuildContext context, WidgetRef ref) {
+    final isReady = ref.read(activeHorseResultsProvider).hasValue;
+    if (!isReady) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('表示用データの準備が完了していません'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
     showDialog(
       context: context,
       builder: (context) => const HorseNameListDialog(),

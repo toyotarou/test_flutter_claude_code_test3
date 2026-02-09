@@ -358,6 +358,48 @@ final class AllHourseNamesWithStatsProvider
 String _$allHourseNamesWithStatsHash() =>
     r'f03537325e025e8c123148309242a51e8214018d';
 
+@ProviderFor(activeHorseResults)
+final activeHorseResultsProvider = ActiveHorseResultsProvider._();
+
+final class ActiveHorseResultsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<Map<String, List<HourseRaceResult>>>,
+          Map<String, List<HourseRaceResult>>,
+          FutureOr<Map<String, List<HourseRaceResult>>>
+        >
+    with
+        $FutureModifier<Map<String, List<HourseRaceResult>>>,
+        $FutureProvider<Map<String, List<HourseRaceResult>>> {
+  ActiveHorseResultsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'activeHorseResultsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$activeHorseResultsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<Map<String, List<HourseRaceResult>>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<Map<String, List<HourseRaceResult>>> create(Ref ref) {
+    return activeHorseResults(ref);
+  }
+}
+
+String _$activeHorseResultsHash() =>
+    r'bbf238b6d9bf29d26f6671e040da26008791d660';
+
 @ProviderFor(raceMap)
 final raceMapProvider = RaceMapProvider._();
 
