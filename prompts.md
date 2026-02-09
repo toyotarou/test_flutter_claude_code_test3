@@ -1026,3 +1026,32 @@
 - データ準備完了後は通常通りダイアログを開く
 
 ---
+
+## 56. データ未準備時にポーリング風のローディング表示＋自動ダイアログ表示
+
+**プロンプト：**
+
+> リストボタン押下時、データ未準備ならCircularProgressIndicatorを表示し、準備完了後に自動でダイアログを開く（ポーリング方式）
+
+**対応内容：**
+
+- `useState<bool>`で「ダイアログ待ち」状態を管理
+- ボタン押下時にデータ未準備 → SnackBarの代わりに待ち状態ONにし、半透明オーバーレイ＋CircularProgressIndicator＋「データ準備中...」テキストを表示
+- `ref.listen`でactiveHorseResultsProviderの状態変化を監視し、待ち状態中にデータ準備完了 → 待ち状態OFF＋自動でHorseNameListDialogを表示
+- タイマー不要のリアクティブ方式（Riverpodの`ref.listen`を活用）
+
+---
+
+## 57. ダイアログ再表示時もCircularProgressIndicator表示
+
+**プロンプト：**
+
+> 一度開いて閉じた後、再度開く際にも待ちが発生するので、その時もCircleProgressを表示したい
+
+**対応内容：**
+
+- `_showHorseNameListDialog`を変更：データ準備済みの場合も常にProgressIndicatorを表示
+- `Future.delayed(200ms)`で一瞬Progress表示後にダイアログを開く
+- 連打防止のガード（`isWaitingForDialog.value`がtrueなら無視）を追加
+
+---

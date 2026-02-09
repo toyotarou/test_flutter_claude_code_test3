@@ -18,6 +18,18 @@ class HomeScreen extends HookConsumerWidget {
     final scrollController = useScrollController();
     final asyncRaces = ref.watch(allRaceProvider);
     ref.watch(activeHorseResultsProvider);
+    final isWaitingForDialog = useState(false);
+
+    // データ準備完了を検知してダイアログを開く
+    ref.listen(activeHorseResultsProvider, (prev, next) {
+      if (isWaitingForDialog.value && next.hasValue) {
+        isWaitingForDialog.value = false;
+        showDialog(
+          context: context,
+          builder: (context) => const HorseNameListDialog(),
+        );
+      }
+    });
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
@@ -44,7 +56,7 @@ class HomeScreen extends HookConsumerWidget {
           ),
         ),
         body: SafeArea(child: asyncRaces.when(
-          data: (races) => _buildBody(context, races, ref, searchController, scrollController),
+          data: (races) => _buildBody(context, races, ref, searchController, scrollController, isWaitingForDialog),
           loading: () => const Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -101,7 +113,8 @@ class HomeScreen extends HookConsumerWidget {
   }
 
   Widget _buildBody(BuildContext context, List<HourseRaceList> races,
-      WidgetRef ref, TextEditingController searchController, ScrollController scrollController) {
+      WidgetRef ref, TextEditingController searchController, ScrollController scrollController,
+      ValueNotifier<bool> isWaitingForDialog) {
     final selectedYear = ref.watch(selectedYearProvider);
     final hourseNameStats = ref.watch(allHourseNamesWithStatsProvider).value ?? [];
 
@@ -119,16 +132,45 @@ class HomeScreen extends HookConsumerWidget {
       return (a.raceName ?? '').compareTo(b.raceName ?? '');
     });
 
-    return Column(
+    return Stack(
       children: [
-        SearchBarWidget(
-          searchController: searchController,
-          hourseNameStats: hourseNameStats,
-          onSearch: () => _onSearch(context, searchController),
-          onListTap: () => _showHorseNameListDialog(context, ref),
+        Column(
+          children: [
+            SearchBarWidget(
+              searchController: searchController,
+              hourseNameStats: hourseNameStats,
+              onSearch: () => _onSearch(context, searchController),
+              onListTap: () => _showHorseNameListDialog(context, ref, isWaitingForDialog),
+            ),
+            _buildYearSelector(years, selectedYear, ref, scrollController),
+            Expanded(child: _buildRaceList(context, filteredRaces, scrollController)),
+          ],
         ),
-        _buildYearSelector(years, selectedYear, ref, scrollController),
-        Expanded(child: _buildRaceList(context, filteredRaces, scrollController)),
+        if (isWaitingForDialog.value)
+          Positioned.fill(
+            child: Container(
+              color: Colors.black54,
+              child: const Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(
+                      color: Color(0xFF53C0F0),
+                      strokeWidth: 3,
+                    ),
+                    SizedBox(height: 16),
+                    Text(
+                      'データ準備中...',
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
       ],
     );
   }
@@ -350,21 +392,26 @@ class HomeScreen extends HookConsumerWidget {
     );
   }
 
-  void _showHorseNameListDialog(BuildContext context, WidgetRef ref) {
+  void _showHorseNameListDialog(BuildContext context, WidgetRef ref,
+      ValueNotifier<bool> isWaitingForDialog) {
+    if (isWaitingForDialog.value) return; // 既に待機中なら無視
+
+    isWaitingForDialog.value = true;
+
     final isReady = ref.read(activeHorseResultsProvider).hasValue;
-    if (!isReady) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('表示用データの準備が完了していません'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-      return;
+    if (isReady) {
+      // データ準備済み → Progress表示後にダイアログを開く
+      Future.delayed(const Duration(milliseconds: 200), () {
+        if (context.mounted) {
+          isWaitingForDialog.value = false;
+          showDialog(
+            context: context,
+            builder: (context) => const HorseNameListDialog(),
+          );
+        }
+      });
     }
-    showDialog(
-      context: context,
-      builder: (context) => const HorseNameListDialog(),
-    );
+    // データ未準備の場合はref.listenが準備完了時にダイアログを開く
   }
 
   void _showRaceResultDialog(BuildContext context, HourseRaceList race) {
