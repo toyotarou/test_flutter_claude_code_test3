@@ -5,9 +5,14 @@ import '../models/hourse_name_stats.dart';
 import '../providers/race_provider.dart';
 import 'horse_search_result_dialog.dart';
 
-class HorseNameListDialog extends ConsumerWidget {
+class HorseNameListDialog extends ConsumerStatefulWidget {
   const HorseNameListDialog({super.key});
 
+  @override
+  ConsumerState<HorseNameListDialog> createState() => _HorseNameListDialogState();
+}
+
+class _HorseNameListDialogState extends ConsumerState<HorseNameListDialog> {
   static const _katakanaRows = {
     'ア行': ['ア', 'イ', 'ウ', 'エ', 'オ'],
     'カ行': ['カ', 'キ', 'ク', 'ケ', 'コ', 'ガ', 'ギ', 'グ', 'ゲ', 'ゴ'],
@@ -19,6 +24,13 @@ class HorseNameListDialog extends ConsumerWidget {
     'ヤ行': ['ヤ', 'ユ', 'ヨ'],
     'ラ行': ['ラ', 'リ', 'ル', 'レ', 'ロ'],
     'ワ行': ['ワ', 'ヲ', 'ン'],
+  };
+
+  static const _navLabels = ['ア', 'カ', 'サ', 'タ', 'ナ', 'ハ', 'マ', 'ヤ', 'ラ', 'ワ'];
+
+  final _groupKeys = <String, GlobalKey>{
+    for (final key in const ['ア行', 'カ行', 'サ行', 'タ行', 'ナ行', 'ハ行', 'マ行', 'ヤ行', 'ラ行', 'ワ行'])
+      key: GlobalKey(),
   };
 
   String _getRowKey(String name) {
@@ -37,8 +49,21 @@ class HorseNameListDialog extends ConsumerWidget {
     return lastYear >= currentYear - 1;
   }
 
+  void _scrollToGroup(String label) {
+    final key = '$label行';
+    final globalKey = _groupKeys[key];
+    if (globalKey?.currentContext != null) {
+      Scrollable.ensureVisible(
+        globalKey!.currentContext!,
+        alignment: 0.0,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final asyncStats = ref.watch(allHourseNamesWithStatsProvider);
 
     return Dialog(
@@ -60,6 +85,37 @@ class HorseNameListDialog extends ConsumerWidget {
                 '馬名一覧（あいうえお順）',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+            SizedBox(
+              height: 40,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                itemCount: _navLabels.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 4),
+                itemBuilder: (context, index) {
+                  final label = _navLabels[index];
+                  return GestureDetector(
+                    onTap: () => _scrollToGroup(label),
+                    child: Container(
+                      width: 32,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0F3460),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        label,
+                        style: const TextStyle(
+                          color: Color(0xFF53C0F0),
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
             Flexible(
@@ -108,6 +164,7 @@ class HorseNameListDialog extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
+          key: _groupKeys[groupName],
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           color: const Color(0xFF0F3460).withValues(alpha: 0.5),

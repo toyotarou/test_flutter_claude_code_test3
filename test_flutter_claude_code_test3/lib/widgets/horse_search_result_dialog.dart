@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../models/hourse_race_list.dart';
 import '../models/hourse_race_result.dart';
 import '../providers/race_provider.dart';
+import 'race_result_dialog.dart';
 import 'result_chart_painter.dart';
 
 class HorseSearchResultDialog extends ConsumerWidget {
@@ -115,7 +117,7 @@ class HorseSearchResultDialog extends ConsumerWidget {
                     );
                   }
 
-                  return _buildResultContent(results);
+                  return _buildResultContent(context, results);
                 },
               ),
             ),
@@ -126,7 +128,7 @@ class HorseSearchResultDialog extends ConsumerWidget {
     );
   }
 
-  Widget _buildResultContent(List<HourseRaceResult> results) {
+  Widget _buildResultContent(BuildContext context, List<HourseRaceResult> results) {
     return ListView(
       shrinkWrap: true,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -209,12 +211,34 @@ class HorseSearchResultDialog extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: 1),
-                      Text(
-                        r.raceName ?? '',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
+                      GestureDetector(
+                        onTap: () {
+                          final name = r.raceName ?? '';
+                          if (name.isNotEmpty) {
+                            showDialog(
+                              context: context,
+                              builder: (_) => RaceResultDialog(
+                                race: HourseRaceList(
+                                  id: 0,
+                                  year: r.year,
+                                  month: r.month,
+                                  day: r.day,
+                                  grade: r.grade,
+                                  raceName: r.raceName,
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                        child: Text(
+                          r.raceName ?? '',
+                          style: const TextStyle(
+                            color: Color(0xFF53C0F0),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            decoration: TextDecoration.underline,
+                            decorationColor: Color(0xFF53C0F0),
+                          ),
                         ),
                       ),
                     ],

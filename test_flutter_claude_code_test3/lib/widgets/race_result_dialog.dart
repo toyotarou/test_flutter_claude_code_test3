@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import '../models/hourse_race_list.dart';
 import '../models/hourse_race_result.dart';
 import '../providers/race_provider.dart';
+import 'horse_search_result_dialog.dart';
 
 class RaceResultDialog extends ConsumerWidget {
   const RaceResultDialog({super.key, required this.race});
@@ -165,12 +166,25 @@ class RaceResultDialog extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      r.hourseName ?? '',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                    GestureDetector(
+                      onTap: () {
+                        final name = r.hourseName ?? '';
+                        if (name.isNotEmpty) {
+                          showDialog(
+                            context: context,
+                            builder: (_) => HorseSearchResultDialog(hourseName: name),
+                          );
+                        }
+                      },
+                      child: Text(
+                        r.hourseName ?? '',
+                        style: const TextStyle(
+                          color: Color(0xFF53C0F0),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          decoration: TextDecoration.underline,
+                          decorationColor: Color(0xFF53C0F0),
+                        ),
                       ),
                     ),
                     Text(
