@@ -146,16 +146,13 @@ class _HorseNameListDialogState extends ConsumerState<HorseNameListDialog> {
 
     final orderedKeys = [..._katakanaRows.keys, if (grouped.containsKey('その他')) 'その他'];
 
-    return ListView.builder(
+    return ListView(
       padding: const EdgeInsets.symmetric(vertical: 8),
-      itemCount: orderedKeys.length,
-      itemBuilder: (context, index) {
-        final key = orderedKeys[index];
-        final items = grouped[key];
-        if (items == null || items.isEmpty) return const SizedBox.shrink();
-
-        return _buildGroup(context, key, items);
-      },
+      children: [
+        for (final key in orderedKeys)
+          if (grouped[key] != null && grouped[key]!.isNotEmpty)
+            _buildGroup(context, key, grouped[key]!),
+      ],
     );
   }
 

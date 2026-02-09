@@ -969,3 +969,17 @@
 - APIの変更なし、既存の `allRaceProvider` データを再利用するアプローチ
 
 ---
+
+## 52. 馬名一覧ダイアログの「アカサタナ」ボタンが反応しない
+
+**プロンプト：**
+
+> horse_name_list_dialog.dart の画面上部に横向きに「アカサタナ」のボタンがありますが、押しても反応しません。「カ」をタップしても「カ」の位置までスクロールしません。
+
+**対応内容：**
+
+- 原因: `ListView.builder` の遅延描画により、画面外グループの `GlobalKey.currentContext` が `null` で `Scrollable.ensureVisible` が動作しなかった
+- `_buildGroupedList` の `ListView.builder` を `ListView(children: [...])` に変更し、全グループを即座に構築するよう修正
+- これにより `GlobalKey` が常に有効になり、タップでスクロールが正常に動作するようになった
+
+---
