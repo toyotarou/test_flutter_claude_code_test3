@@ -357,3 +357,44 @@ final class AllHourseNamesWithStatsProvider
 
 String _$allHourseNamesWithStatsHash() =>
     r'f03537325e025e8c123148309242a51e8214018d';
+
+@ProviderFor(raceMap)
+final raceMapProvider = RaceMapProvider._();
+
+final class RaceMapProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<Map<String, HourseRaceList>>,
+          Map<String, HourseRaceList>,
+          FutureOr<Map<String, HourseRaceList>>
+        >
+    with
+        $FutureModifier<Map<String, HourseRaceList>>,
+        $FutureProvider<Map<String, HourseRaceList>> {
+  RaceMapProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'raceMapProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$raceMapHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<Map<String, HourseRaceList>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<Map<String, HourseRaceList>> create(Ref ref) {
+    return raceMap(ref);
+  }
+}
+
+String _$raceMapHash() => r'0f920000cfbf6209f04f414feb7f5b03cad8e55a';

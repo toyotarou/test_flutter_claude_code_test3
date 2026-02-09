@@ -117,7 +117,8 @@ class HorseSearchResultDialog extends ConsumerWidget {
                     );
                   }
 
-                  return _buildResultContent(context, results);
+                  final raceMap = ref.watch(raceMapProvider).value ?? {};
+                  return _buildResultContent(context, results, raceMap);
                 },
               ),
             ),
@@ -128,7 +129,7 @@ class HorseSearchResultDialog extends ConsumerWidget {
     );
   }
 
-  Widget _buildResultContent(BuildContext context, List<HourseRaceResult> results) {
+  Widget _buildResultContent(BuildContext context, List<HourseRaceResult> results, Map<String, HourseRaceList> raceMap) {
     return ListView(
       shrinkWrap: true,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -215,10 +216,12 @@ class HorseSearchResultDialog extends ConsumerWidget {
                         onTap: () {
                           final name = r.raceName ?? '';
                           if (name.isNotEmpty) {
+                            final key = '${r.year}/${r.month}/${r.day}/${r.raceName}';
+                            final raceInfo = raceMap[key];
                             showDialog(
                               context: context,
                               builder: (_) => RaceResultDialog(
-                                race: HourseRaceList(
+                                race: raceInfo ?? HourseRaceList(
                                   id: 0,
                                   year: r.year,
                                   month: r.month,

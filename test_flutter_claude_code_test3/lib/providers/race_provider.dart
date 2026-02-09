@@ -110,6 +110,17 @@ Future<List<HourseNameStats>> allHourseNamesWithStats(Ref ref) async {
   return jsonList.map((json) => HourseNameStats.fromJson(json)).toList();
 }
 
+@riverpod
+Future<Map<String, HourseRaceList>> raceMap(Ref ref) async {
+  final races = await ref.watch(allRaceProvider.future);
+  final map = <String, HourseRaceList>{};
+  for (final race in races) {
+    final key = '${race.year}/${race.month}/${race.day}/${race.raceName}';
+    map[key] = race;
+  }
+  return map;
+}
+
 String toKatakana(String input) {
   return String.fromCharCodes(input.runes.map((rune) {
     if (rune >= 0x3041 && rune <= 0x3096) {

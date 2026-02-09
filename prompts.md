@@ -955,3 +955,17 @@
 - 馬詳細 ↔ レース結果を相互に行き来できるようになった
 
 ---
+
+## 51. 検索結果→レースダイアログで場所・コース・条件が表示されない
+
+**プロンプト：**
+
+> 検索結果からレース情報ダイアログを開いた時に画面上部の[place][course_length][age_rate]が表示されていません。
+
+**対応内容：**
+
+- `race_provider.dart` に `raceMapProvider` を追加（`allRaceProvider` のデータを `year/month/day/raceName` をキーにしたMapに変換）
+- `horse_search_result_dialog.dart` で `raceMapProvider` をwatchし、レース名タップ時にMapからフル情報の `HourseRaceList` を取得して `RaceResultDialog` に渡すよう修正
+- APIの変更なし、既存の `allRaceProvider` データを再利用するアプローチ
+
+---
