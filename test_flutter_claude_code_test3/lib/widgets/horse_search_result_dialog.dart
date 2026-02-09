@@ -35,14 +35,55 @@ class HorseSearchResultDialog extends ConsumerWidget {
                 ),
                 borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
               ),
-              child: Text(
-                hourseName,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    hourseName,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  asyncResults.when(
+                    loading: () => const SizedBox.shrink(),
+                    error: (_, __) => const SizedBox.shrink(),
+                    data: (results) {
+                      if (results.isEmpty) return const SizedBox.shrink();
+                      final ageStr = results.last.age ?? '';
+                      final sex = ageStr.isNotEmpty ? ageStr.substring(0, 1) : '';
+                      if (sex.isEmpty) return const SizedBox.shrink();
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: sex == '牝'
+                                ? const Color(0xFFE91E63).withValues(alpha: 0.3)
+                                : sex == 'セ'
+                                    ? const Color(0xFF4CAF50).withValues(alpha: 0.3)
+                                    : const Color(0xFF2196F3).withValues(alpha: 0.3),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            sex,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: sex == '牝'
+                                  ? const Color(0xFFE91E63)
+                                  : sex == 'セ'
+                                      ? const Color(0xFF4CAF50)
+                                      : const Color(0xFF2196F3),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
             Flexible(

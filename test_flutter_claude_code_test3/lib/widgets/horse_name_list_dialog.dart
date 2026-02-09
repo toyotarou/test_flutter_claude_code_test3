@@ -188,6 +188,46 @@ class _ActiveHorseItem extends ConsumerWidget {
             ),
             const SizedBox(height: 4),
             asyncResults.when(
+              loading: () => const SizedBox.shrink(),
+              error: (_, __) => const SizedBox.shrink(),
+              data: (results) {
+                final filtered = results
+                    .where((r) => r.hourseName == stats.hourseName)
+                    .toList();
+                if (filtered.isEmpty) return const SizedBox.shrink();
+                final lastRace = filtered.last;
+                final ageStr = lastRace.age ?? '';
+                final sex = ageStr.isNotEmpty ? ageStr.substring(0, 1) : '';
+                if (sex.isEmpty) return const SizedBox.shrink();
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 2),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                    decoration: BoxDecoration(
+                      color: sex == '牝'
+                          ? const Color(0xFFE91E63).withValues(alpha: 0.3)
+                          : sex == 'セ'
+                              ? const Color(0xFF4CAF50).withValues(alpha: 0.3)
+                              : const Color(0xFF2196F3).withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      sex,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: sex == '牝'
+                            ? const Color(0xFFE91E63)
+                            : sex == 'セ'
+                                ? const Color(0xFF4CAF50)
+                                : const Color(0xFF2196F3),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+            asyncResults.when(
               loading: () => const SizedBox(height: 22),
               error: (_, __) => const SizedBox.shrink(),
               data: (results) {
@@ -195,14 +235,19 @@ class _ActiveHorseItem extends ConsumerWidget {
                     .where((r) => r.hourseName == stats.hourseName)
                     .toList();
                 if (filtered.isEmpty) return const SizedBox.shrink();
+                final shouldReverse = filtered.length > 10;
                 return SizedBox(
                   height: 22,
                   child: ListView.separated(
+                    reverse: shouldReverse,
                     scrollDirection: Axis.horizontal,
                     itemCount: filtered.length,
                     separatorBuilder: (_, __) => const SizedBox(width: 3),
                     itemBuilder: (context, index) {
-                      final pos = filtered[index].result ?? 0;
+                      final actualIndex = shouldReverse
+                          ? filtered.length - 1 - index
+                          : index;
+                      final pos = filtered[actualIndex].result ?? 0;
                       return CircleAvatar(
                         radius: 10,
                         backgroundColor: _posColor(pos),
