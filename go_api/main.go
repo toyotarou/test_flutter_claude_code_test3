@@ -86,6 +86,7 @@ func main() {
 	http.HandleFunc("/getResultByHourseName", corsMiddleware(getResultByHourseNameHandler))
 	http.HandleFunc("/getAllHourseNames", corsMiddleware(getAllHourseNamesHandler))
 	http.HandleFunc("/getAllHourseNamesWithStats", corsMiddleware(getAllHourseNamesWithStatsHandler))
+	http.HandleFunc("/getAllRaceResults", corsMiddleware(getAllRaceResultsHandler))
 
 	log.Println("Server starting on port 8080...")
 	log.Fatal(http.ListenAndServe(":8080", nil))
@@ -301,4 +302,31 @@ func getAllHourseNamesWithStatsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondJSON(w, stats)
+}
+
+// getAllRaceResultsHandler handles /getAllRaceResults
+// Returns all race results (SELECT * FROM t_hourse_race_result)
+func getAllRaceResultsHandler(w http.ResponseWriter, r *http.Request) {
+	query := "SELECT id, year, month, day, grade, race_name, result, hourse_name, age, jockey_name, race_time FROM t_hourse_race_result ORDER BY year, month, day, race_name, result"
+
+	rows, err := db.Query(query)
+	if err != nil {
+		respondError(w, "Database query error", http.StatusInternalServerError)
+		log.Println("Query error:", err)
+		return
+	}
+	defer rows.Close()
+
+	var results []HourseRaceResult
+	for rows.Next() {
+		var result HourseRaceResult
+		if err := rows.Scan(&result.ID, &result.Year, &result.Month, &result.Day, &result.Grade, &result.RaceName, &result.Result, &result.HourseName, &result.Age, &result.JockeyName, &result.RaceTime); err != nil {
+			respondError(w, "Scan error", http.StatusInternalServerError)
+			log.Println("Scan error:", err)
+			return
+		}
+		results = append(results, result)
+	}
+
+	respondJSON(w, results)
 }

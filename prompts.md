@@ -1055,3 +1055,23 @@
 - 連打防止のガード（`isWaitingForDialog.value`がtrueなら無視）を追加
 
 ---
+
+## 58. 全レース結果一括取得APIの追加＋Flutter側の大幅軽量化
+
+**プロンプト：**
+
+> 馬名一覧にレース結果がない馬がいる。APIエンドポイントを追加（SELECT * FROM t_hourse_race_result）して、Flutter側の処理も軽くできる場所があったら対応して欲しい。
+
+**対応内容：**
+
+- **Go API**: `/getAllRaceResults` エンドポイント追加（全レース結果を一括返却）
+- **Flutter**: `allRaceResultsProvider` を追加し、以下を全てローカルデータからの派生に置き換え
+  - `activeHorseResultsProvider`: 馬ごとの個別APIコール → ローカルフィルタ
+  - `resultByHourseNameProvider`: LIKE検索APIコール → ローカル完全一致フィルタ（LIKE汚染問題も解消）
+  - `selectedResultProvider`: APIコール → ローカルフィルタ
+  - `allHourseNamesWithStatsProvider`: APIコール → ローカル集計
+  - `allHourseNamesProvider`: APIコール → ローカル集計
+- **APIコール数**: 起動時 N+4回 → 2回（`/getAllRace` + `/getAllRaceResults`のみ）
+- ※サーバーへのデプロイは手動で実施が必要（SSH接続できなかったため）
+
+---

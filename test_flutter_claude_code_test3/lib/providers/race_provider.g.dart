@@ -102,8 +102,58 @@ abstract class _$SelectedYear extends $Notifier<String?> {
   }
 }
 
+/// 全レース結果を一括取得（SELECT * FROM t_hourse_race_result）
+
+@ProviderFor(allRaceResults)
+final allRaceResultsProvider = AllRaceResultsProvider._();
+
+/// 全レース結果を一括取得（SELECT * FROM t_hourse_race_result）
+
+final class AllRaceResultsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<HourseRaceResult>>,
+          List<HourseRaceResult>,
+          FutureOr<List<HourseRaceResult>>
+        >
+    with
+        $FutureModifier<List<HourseRaceResult>>,
+        $FutureProvider<List<HourseRaceResult>> {
+  /// 全レース結果を一括取得（SELECT * FROM t_hourse_race_result）
+  AllRaceResultsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'allRaceResultsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$allRaceResultsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<HourseRaceResult>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<HourseRaceResult>> create(Ref ref) {
+    return allRaceResults(ref);
+  }
+}
+
+String _$allRaceResultsHash() => r'3d0e32f0791ee1bfb6208d9997f1575b85e05460';
+
+/// 馬名一覧（不要になったAPIコールをローカル集計に置き換え）
+
 @ProviderFor(allHourseNames)
 final allHourseNamesProvider = AllHourseNamesProvider._();
+
+/// 馬名一覧（不要になったAPIコールをローカル集計に置き換え）
 
 final class AllHourseNamesProvider
     extends
@@ -113,6 +163,7 @@ final class AllHourseNamesProvider
           FutureOr<List<String>>
         >
     with $FutureModifier<List<String>>, $FutureProvider<List<String>> {
+  /// 馬名一覧（不要になったAPIコールをローカル集計に置き換え）
   AllHourseNamesProvider._()
     : super(
         from: null,
@@ -139,10 +190,14 @@ final class AllHourseNamesProvider
   }
 }
 
-String _$allHourseNamesHash() => r'1706c2455910bf433dbd7fc7c169a4414c5fbb30';
+String _$allHourseNamesHash() => r'55a25acd01093e72cc59043ca4e424bc1d91b599';
+
+/// 特定レースの結果（ローカルフィルタリング）
 
 @ProviderFor(selectedResult)
 final selectedResultProvider = SelectedResultFamily._();
+
+/// 特定レースの結果（ローカルフィルタリング）
 
 final class SelectedResultProvider
     extends
@@ -154,6 +209,7 @@ final class SelectedResultProvider
     with
         $FutureModifier<List<HourseRaceResult>>,
         $FutureProvider<List<HourseRaceResult>> {
+  /// 特定レースの結果（ローカルフィルタリング）
   SelectedResultProvider._({
     required SelectedResultFamily super.from,
     required ({String year, String month, String day, String raceName})
@@ -207,7 +263,9 @@ final class SelectedResultProvider
   }
 }
 
-String _$selectedResultHash() => r'3e7ffa2cac621fb57cca89fa56c6b2e506e2e937';
+String _$selectedResultHash() => r'92fdda54ccb68dd760ea6fcae1c73e0f400c6ed2';
+
+/// 特定レースの結果（ローカルフィルタリング）
 
 final class SelectedResultFamily extends $Family
     with
@@ -224,6 +282,8 @@ final class SelectedResultFamily extends $Family
         isAutoDispose: true,
       );
 
+  /// 特定レースの結果（ローカルフィルタリング）
+
   SelectedResultProvider call({
     required String year,
     required String month,
@@ -238,8 +298,12 @@ final class SelectedResultFamily extends $Family
   String toString() => r'selectedResultProvider';
 }
 
+/// 馬名で検索（ローカル完全一致フィルタリング、LIKE問題解消）
+
 @ProviderFor(resultByHourseName)
 final resultByHourseNameProvider = ResultByHourseNameFamily._();
+
+/// 馬名で検索（ローカル完全一致フィルタリング、LIKE問題解消）
 
 final class ResultByHourseNameProvider
     extends
@@ -251,6 +315,7 @@ final class ResultByHourseNameProvider
     with
         $FutureModifier<List<HourseRaceResult>>,
         $FutureProvider<List<HourseRaceResult>> {
+  /// 馬名で検索（ローカル完全一致フィルタリング、LIKE問題解消）
   ResultByHourseNameProvider._({
     required ResultByHourseNameFamily super.from,
     required String super.argument,
@@ -296,7 +361,9 @@ final class ResultByHourseNameProvider
 }
 
 String _$resultByHourseNameHash() =>
-    r'e93ccc104c0c21b22b00d8aacf6fc2de11bac572';
+    r'5c630085cecc9bf4e4e0146cd84cce348bd293e2';
+
+/// 馬名で検索（ローカル完全一致フィルタリング、LIKE問題解消）
 
 final class ResultByHourseNameFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<List<HourseRaceResult>>, String> {
@@ -309,6 +376,8 @@ final class ResultByHourseNameFamily extends $Family
         isAutoDispose: true,
       );
 
+  /// 馬名で検索（ローカル完全一致フィルタリング、LIKE問題解消）
+
   ResultByHourseNameProvider call({required String hourseName}) =>
       ResultByHourseNameProvider._(argument: hourseName, from: this);
 
@@ -316,8 +385,12 @@ final class ResultByHourseNameFamily extends $Family
   String toString() => r'resultByHourseNameProvider';
 }
 
+/// 馬名統計（ローカル集計に置き換え）
+
 @ProviderFor(allHourseNamesWithStats)
 final allHourseNamesWithStatsProvider = AllHourseNamesWithStatsProvider._();
+
+/// 馬名統計（ローカル集計に置き換え）
 
 final class AllHourseNamesWithStatsProvider
     extends
@@ -329,6 +402,7 @@ final class AllHourseNamesWithStatsProvider
     with
         $FutureModifier<List<HourseNameStats>>,
         $FutureProvider<List<HourseNameStats>> {
+  /// 馬名統計（ローカル集計に置き換え）
   AllHourseNamesWithStatsProvider._()
     : super(
         from: null,
@@ -356,10 +430,14 @@ final class AllHourseNamesWithStatsProvider
 }
 
 String _$allHourseNamesWithStatsHash() =>
-    r'f03537325e025e8c123148309242a51e8214018d';
+    r'99896a0cabdf5c1634b4e2e4e4f2d95af1c8d4ea';
+
+/// アクティブ馬の結果Map（ローカルフィルタリング、個別APIコール不要）
 
 @ProviderFor(activeHorseResults)
 final activeHorseResultsProvider = ActiveHorseResultsProvider._();
+
+/// アクティブ馬の結果Map（ローカルフィルタリング、個別APIコール不要）
 
 final class ActiveHorseResultsProvider
     extends
@@ -371,6 +449,7 @@ final class ActiveHorseResultsProvider
     with
         $FutureModifier<Map<String, List<HourseRaceResult>>>,
         $FutureProvider<Map<String, List<HourseRaceResult>>> {
+  /// アクティブ馬の結果Map（ローカルフィルタリング、個別APIコール不要）
   ActiveHorseResultsProvider._()
     : super(
         from: null,
@@ -398,7 +477,7 @@ final class ActiveHorseResultsProvider
 }
 
 String _$activeHorseResultsHash() =>
-    r'bbf238b6d9bf29d26f6671e040da26008791d660';
+    r'8bd3d2ae1b969be541e13fa330c97d8b16df06f4';
 
 @ProviderFor(raceMap)
 final raceMapProvider = RaceMapProvider._();
