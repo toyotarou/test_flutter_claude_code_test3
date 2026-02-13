@@ -1075,3 +1075,128 @@
 - ※サーバーへのデプロイは手動で実施が必要（SSH接続できなかったため）
 
 ---
+
+## 59. 「hourse」→「horse」スペルミス修正の検討
+
+**プロンプト：**
+
+> 「馬」のスペルは「horse」なんですね。「hourse」となっているところを修正してもらえますか
+
+**結果：**
+
+- 調査の結果、影響範囲が非常に広いことが判明（24ファイル）：
+  - Flutterモデルファイル名（hourse_name_stats.dart, hourse_race_result.dart, hourse_race_list.dart）
+  - クラス名（HourseRaceList, HourseRaceResult, HourseNameStats）
+  - フィールド名（hourseName → horseName）
+  - プロバイダー名（resultByHourseName, allHourseNames等）
+  - Go API（構造体名、エンドポイントURL、JSONタグ）
+  - DBテーブル名・カラム名（t_hourse_race_list, hourse_name）- 要マイグレーション
+  - 設定ファイル（Info.plist, AndroidManifest.xml）
+  - 生成ファイル（.g.dart, .freezed.dart）の再生成
+- 大規模変更のためユーザー判断で見送り
+
+---
+
+## 60. appBarに入力アイコン＋レース情報入力ダイアログ追加
+
+**プロンプト：**
+
+> home_screenのappBar内にinputのアイコンをつけてください。タップしたらrace_info_input_dialogが開くようにしてください。中には複数行テキストフィールド（高さいっぱい）と「入力」ボタン。
+
+**結果：**
+
+- `lib/widgets/race_info_input_dialog.dart` を新規作成
+  - 複数行TextField（expands: true で高さいっぱい）
+  - 下部に「入力」ボタン（タップでテキストをpop返却）
+- `lib/screens/home_screen.dart` のappBarにedit_noteアイコン追加（actions）
+  - タップでRaceInfoInputDialogを表示
+
+---
+
+## 61. レース分析結果ダイアログの追加
+
+**プロンプト：**
+
+> テキストフィールドに馬名を改行で入力し、「入力」ボタンを押したらrace_analysis_result_dialogにレコードごとに区切って表示してください。
+
+**結果：**
+
+- `lib/widgets/race_analysis_result_dialog.dart` を新規作成
+  - 馬名リストを受け取り、番号付きで一覧表示
+  - ヘッダーに頭数を表示
+- `lib/widgets/race_info_input_dialog.dart` を修正
+  - 「入力」ボタン押下時にテキストを改行で分割→空行を除去→RaceAnalysisResultDialogを表示
+
+---
+
+## 62. レース分析ダイアログに着順と仮テキスト追加
+
+**プロンプト：**
+
+> 馬名の下に今までのレース結果を表示。a. 着順をCircleAvatarで横スクロール表示 b. 今は「bbb」でいいです。
+
+**結果：**
+
+- `lib/widgets/race_analysis_result_dialog.dart` を大幅修正
+  - `_HorseResultItem`をConsumerWidgetとして分離、`resultByHourseNameProvider`で着順データ取得
+  - 着順をCircleAvatarで横スクロール表示（1着:金, 2着:銀, 3着:銅）
+  - その下に仮テキスト「bbb」を表示
+
+---
+
+## 63. 獲得ポイント平均値の表示
+
+**プロンプト：**
+
+> bbbに「獲得ポイント」の平均値を表示。獲得ポイント＝21-着順。合計を出走回数で割り、小数点第二位で表示。
+
+**結果：**
+
+- `lib/widgets/race_analysis_result_dialog.dart` を修正
+  - 「bbb」を獲得ポイント平均に置き換え（`totalPoints / results.length`、`toStringAsFixed(2)`）
+  - 例: 1着(20pt)+3着(18pt)+5着(16pt) → 平均: 18.00
+
+---
+
+## 64. 獲得ポイント平均でソート表示
+
+**プロンプト：**
+
+> 獲得ポイントの平均でソートして表示。データなしの馬はリストの最後尾。
+
+**結果：**
+
+- `lib/widgets/race_analysis_result_dialog.dart` を大幅リファクタ
+  - `RaceAnalysisResultDialog`を`ConsumerWidget`に変更、`allRaceResultsProvider`で全結果を一括取得
+  - `_sortByAvgPoints`で各馬の平均ポイントを計算し降順ソート（データなしは最後尾）
+  - `_HorseResultItem`を`StatelessWidget`に変更（親からデータを受け取る形に）
+  - 個別のprovider watchが不要になりパフォーマンス改善
+
+---
+
+## 65. ソートの第2キーに馬名あいうえお順を追加
+
+**プロンプト：**
+
+> 獲得ポイントの平均が同じ場合、馬名のあいうえお順でソート。
+
+**結果：**
+
+- `_sortByAvgPoints`のソート条件に第2キー（`a.name.compareTo(b.name)`）を追加
+- データなし同士の場合も馬名順でソート
+
+---
+
+## 66. レース分析ダイアログに戦績リンク追加
+
+**プロンプト：**
+
+> 各行の右側にhorse_search_result_dialogへのリンクをつけてください。
+
+**結果：**
+
+- `lib/widgets/race_analysis_result_dialog.dart` を修正
+  - 各行の馬名右側にinfo_outlineアイコンを追加
+  - タップでHorseSearchResultDialog（その馬の全戦績）を表示
+
+---

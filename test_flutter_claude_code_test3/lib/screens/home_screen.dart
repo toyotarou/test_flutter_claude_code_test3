@@ -6,6 +6,7 @@ import '../models/hourse_race_list.dart';
 import '../providers/race_provider.dart';
 import '../widgets/horse_name_list_dialog.dart';
 import '../widgets/horse_search_result_dialog.dart';
+import '../widgets/race_info_input_dialog.dart';
 import '../widgets/race_result_dialog.dart';
 import '../widgets/search_bar_widget.dart';
 
@@ -45,6 +46,17 @@ class HomeScreen extends HookConsumerWidget {
           centerTitle: true,
           elevation: 0,
           backgroundColor: Colors.transparent,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.edit_note, color: Colors.white),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => const RaceInfoInputDialog(),
+                );
+              },
+            ),
+          ],
           flexibleSpace: Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
